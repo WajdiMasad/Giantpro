@@ -1,6 +1,7 @@
 node_modules/
 package-lock.json
 *.psd
+*.zip
 1 - Products-20260426T011704Z-3-001/
 products_export_1.csv
 dealer supplies.csv
