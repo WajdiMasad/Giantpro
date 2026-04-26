@@ -1,166 +1,297 @@
-/* ── Giant Promotions Cart System ── */
-/* Cart stored in localStorage, checkout = quote request */
+/* ── Giant Promotions Quote System ── */
+/* 3-step modal: Products → Contact Info → Review & Submit */
+/* Mirrors the existing giantpro.com Shopify quote flow */
 
+// ── Cart Data ──
 function getCart() {
   try { return JSON.parse(localStorage.getItem('gp_cart') || '[]'); }
   catch(e) { return []; }
 }
-
 function saveCart(cart) {
   localStorage.setItem('gp_cart', JSON.stringify(cart));
-  updateCartUI();
+  updateBadge();
 }
 
+// ── Add / Remove / Update ──
 function addToCart(btn) {
   const name = btn.dataset.name;
   const img = btn.dataset.img;
   const price = btn.dataset.price;
   const cart = getCart();
   const existing = cart.find(i => i.name === name);
-  if (existing) {
-    existing.qty++;
-  } else {
-    cart.push({ name, img, price, qty: 1 });
-  }
+  if (existing) { existing.qty++; }
+  else { cart.push({ name, img, price, qty: 1 }); }
   saveCart(cart);
+
   // Button feedback
   const orig = btn.innerHTML;
   btn.innerHTML = '<i class="fas fa-check"></i> Added!';
   btn.classList.add('added');
   setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('added'); }, 1200);
-  // Briefly flash open the cart
-  const drawer = document.getElementById('cartDrawer');
-  if (drawer && !drawer.classList.contains('open')) {
-    toggleCart();
-    setTimeout(() => { if(drawer.classList.contains('open')) toggleCart(); }, 2000);
-  }
+
+  // Open modal at step 1
+  openQuoteModal(1);
 }
 
 function removeFromCart(name) {
-  let cart = getCart().filter(i => i.name !== name);
-  saveCart(cart);
+  saveCart(getCart().filter(i => i.name !== name));
+  renderStep(currentStep);
 }
 
-function updateQty(name, delta) {
-  let cart = getCart();
+function updateCartQty(name, val) {
+  const cart = getCart();
   const item = cart.find(i => i.name === name);
   if (item) {
-    item.qty += delta;
-    if (item.qty <= 0) cart = cart.filter(i => i.name !== name);
+    item.qty = Math.max(1, parseInt(val) || 1);
   }
   saveCart(cart);
 }
 
 function clearCart() {
   localStorage.removeItem('gp_cart');
-  updateCartUI();
+  updateBadge();
+  renderStep(1);
 }
 
-function toggleCart() {
-  const drawer = document.getElementById('cartDrawer');
-  const overlay = document.getElementById('cartOverlay');
-  if (!drawer) return;
-  drawer.classList.toggle('open');
-  overlay.classList.toggle('open');
-  document.body.style.overflow = drawer.classList.contains('open') ? 'hidden' : '';
-}
-
-function updateCartUI() {
+// ── Badge ──
+function updateBadge() {
   const cart = getCart();
-  const badge = document.getElementById('cartBadge');
-  const itemsEl = document.getElementById('cartItems');
-  const emptyEl = document.getElementById('cartEmpty');
-  const footerEl = document.getElementById('cartFooter');
-  const toggleBtn = document.getElementById('cartToggle');
-  
-  if (!badge) return;
-  
-  const totalItems = cart.reduce((sum, i) => sum + i.qty, 0);
-  badge.textContent = totalItems;
-  badge.style.display = totalItems > 0 ? 'flex' : 'none';
-  if (toggleBtn) toggleBtn.classList.toggle('has-items', totalItems > 0);
-  
-  if (!itemsEl) return;
-  
-  if (cart.length === 0) {
-    if (emptyEl) emptyEl.style.display = 'flex';
-    if (footerEl) footerEl.style.display = 'none';
-    // Remove all item elements
-    itemsEl.querySelectorAll('.cart-item').forEach(el => el.remove());
-    return;
+  const total = cart.reduce((s, i) => s + i.qty, 0);
+  const badge = document.getElementById('quoteBadge');
+  const tabCount = document.getElementById('quoteTabCount');
+  if (badge) {
+    badge.textContent = total;
+    badge.style.display = total > 0 ? 'flex' : 'none';
   }
-  
-  if (emptyEl) emptyEl.style.display = 'none';
-  if (footerEl) footerEl.style.display = 'block';
-  
-  // Rebuild items
-  itemsEl.querySelectorAll('.cart-item').forEach(el => el.remove());
-  
-  cart.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'cart-item';
-    const priceStr = parseFloat(item.price) > 0 ? `<span class="cart-item-price">$${parseFloat(item.price).toFixed(2)}</span>` : '<span class="cart-item-price quote">Quote</span>';
-    div.innerHTML = `
-      <img src="${item.img}" alt="${item.name}">
-      <div class="cart-item-info">
-        <h4>${item.name}</h4>
-        ${priceStr}
-        <div class="cart-item-qty">
-          <button onclick="updateQty('${item.name.replace(/'/g, "\\'")}', -1)">−</button>
-          <span>${item.qty}</span>
-          <button onclick="updateQty('${item.name.replace(/'/g, "\\'")}', 1)">+</button>
-        </div>
-      </div>
-      <button class="cart-item-remove" onclick="removeFromCart('${item.name.replace(/'/g, "\\'")}')"><i class="fas fa-trash-alt"></i></button>
-    `;
-    itemsEl.appendChild(div);
-  });
+  if (tabCount) tabCount.textContent = total;
+  const toggleBtn = document.getElementById('quoteToggle');
+  if (toggleBtn) toggleBtn.classList.toggle('has-items', total > 0);
 }
 
-function prepareCheckout() {
-  const cart = getCart();
-  if (cart.length === 0) return false;
-  // Store cart data for the contact page to pick up
-  localStorage.setItem('gp_checkout', 'true');
-  return true;
+// ── Modal Control ──
+let currentStep = 1;
+
+function openQuoteModal(step) {
+  currentStep = step || 1;
+  document.getElementById('quoteModal').classList.add('open');
+  document.getElementById('quoteOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderStep(currentStep);
 }
 
-// ── Contact page: pick up cart items ──
-function handleCheckout() {
-  const params = new URLSearchParams(window.location.search);
-  const isCart = params.get('cart') === 'true';
-  const isCheckout = localStorage.getItem('gp_checkout') === 'true';
-  
-  if (isCart && isCheckout) {
+function closeQuoteModal() {
+  document.getElementById('quoteModal').classList.remove('open');
+  document.getElementById('quoteOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function goToStep(step) {
+  if (step === 2) {
     const cart = getCart();
-    if (cart.length > 0) {
-      const textarea = document.querySelector('textarea.form-control');
-      const heading = document.querySelector('form') && document.querySelector('form').closest('div').querySelector('h3');
-      
-      let msg = "Hi, I'd like to request a quote for the following items:\n\n";
-      cart.forEach((item, i) => {
-        msg += `${i+1}. ${item.name} — Qty: ${item.qty}`;
-        if (parseFloat(item.price) > 0) msg += ` (Listed: $${parseFloat(item.price).toFixed(2)} each)`;
-        msg += '\n';
-      });
-      msg += '\nPlease let me know about availability and pricing. Thank you!';
-      
-      if (textarea) textarea.value = msg;
-      if (heading) heading.textContent = `Quote Request (${cart.length} items)`;
-      
-      const pageH1 = document.querySelector('.page-hero h1');
-      if (pageH1) pageH1.textContent = 'Request a Quote';
-      
-      // Clear checkout flag (but keep cart so they can still see it)
-      localStorage.removeItem('gp_checkout');
+    if (cart.length === 0) return;
+  }
+  if (step === 3) {
+    // Validate contact fields
+    const name = document.getElementById('qName').value.trim();
+    const email = document.getElementById('qEmail').value.trim();
+    if (!name || !email) {
+      alert('Please fill in your name and email.');
+      return;
     }
   }
+  currentStep = step;
+  renderStep(step);
 }
 
-// Init on page load
-document.addEventListener('DOMContentLoaded', () => {
-  updateCartUI();
-  if (window.location.pathname.includes('contact')) {
-    handleCheckout();
+function renderStep(step) {
+  // Update step indicators
+  document.querySelectorAll('.quote-step-tab').forEach(tab => {
+    const s = parseInt(tab.dataset.step);
+    tab.classList.toggle('active', s === step);
+    tab.classList.toggle('completed', s < step);
+  });
+
+  const body = document.getElementById('quoteBody');
+  const footer = document.getElementById('quoteFooter');
+  const cart = getCart();
+
+  if (step === 1) {
+    renderStep1(body, footer, cart);
+  } else if (step === 2) {
+    renderStep2(body, footer);
+  } else if (step === 3) {
+    renderStep3(body, footer, cart);
   }
+}
+
+// ── Step 1: Products Selection ──
+function renderStep1(body, footer, cart) {
+  if (cart.length === 0) {
+    body.innerHTML = `
+      <div class="quote-empty">
+        <i class="fas fa-cart-plus"></i>
+        <h4>Your quote list is empty</h4>
+        <p>Browse our catalog and add products to get started</p>
+      </div>`;
+    footer.innerHTML = `
+      <button class="quote-btn quote-btn-outline" onclick="closeQuoteModal()">Continue Shopping</button>`;
+    return;
+  }
+
+  let rows = cart.map(item => `
+    <div class="quote-product-row">
+      <img src="${item.img}" alt="${item.name}">
+      <div class="quote-product-name">${item.name}</div>
+      <input type="number" class="quote-qty-input" value="${item.qty}" min="1" 
+             onchange="updateCartQty('${item.name.replace(/'/g, "\\'")}', this.value); renderStep(1);">
+      <button class="quote-remove-btn" onclick="removeFromCart('${item.name.replace(/'/g, "\\'")}')">
+        <i class="fas fa-trash-alt"></i>
+      </button>
+    </div>`).join('');
+
+  body.innerHTML = `
+    <div class="quote-products-table">
+      <div class="quote-table-header">
+        <span>Product</span>
+        <span>Quantity</span>
+        <span></span>
+      </div>
+      ${rows}
+    </div>`;
+
+  footer.innerHTML = `
+    <button class="quote-btn quote-btn-outline" onclick="closeQuoteModal()">Continue Shopping</button>
+    <button class="quote-btn quote-btn-primary" onclick="goToStep(2)">Next Step <i class="fas fa-arrow-right"></i></button>`;
+}
+
+// ── Step 2: Contact Information ──
+function renderStep2(body, footer) {
+  // Preserve existing values
+  const saved = JSON.parse(localStorage.getItem('gp_contact') || '{}');
+
+  body.innerHTML = `
+    <div class="quote-contact-form">
+      <div class="quote-form-group">
+        <label for="qName">Full Name <span class="req">*</span></label>
+        <input type="text" id="qName" class="quote-input" placeholder="John Doe" value="${saved.name || ''}" required>
+      </div>
+      <div class="quote-form-group">
+        <label for="qEmail">Email Address <span class="req">*</span></label>
+        <input type="email" id="qEmail" class="quote-input" placeholder="john@example.com" value="${saved.email || ''}" required>
+      </div>
+      <div class="quote-form-group">
+        <label for="qPhone">Phone Number</label>
+        <input type="tel" id="qPhone" class="quote-input" placeholder="902-555-0000" value="${saved.phone || ''}">
+      </div>
+      <div class="quote-form-group">
+        <label for="qDate">Event Date</label>
+        <input type="date" id="qDate" class="quote-input" value="${saved.date || ''}">
+      </div>
+      <div class="quote-form-group">
+        <label for="qMessage">Message / Special Instructions</label>
+        <textarea id="qMessage" class="quote-input quote-textarea" placeholder="Tell us about your event, venue, or any special requirements...">${saved.message || ''}</textarea>
+      </div>
+    </div>`;
+
+  footer.innerHTML = `
+    <button class="quote-btn quote-btn-outline" onclick="goToStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
+    <button class="quote-btn quote-btn-primary" onclick="saveContactAndNext()">Next Step <i class="fas fa-arrow-right"></i></button>`;
+}
+
+function saveContactAndNext() {
+  const contact = {
+    name: document.getElementById('qName').value.trim(),
+    email: document.getElementById('qEmail').value.trim(),
+    phone: document.getElementById('qPhone').value.trim(),
+    date: document.getElementById('qDate').value,
+    message: document.getElementById('qMessage').value.trim()
+  };
+  if (!contact.name || !contact.email) {
+    alert('Please fill in your name and email address.');
+    return;
+  }
+  localStorage.setItem('gp_contact', JSON.stringify(contact));
+  goToStep(3);
+}
+
+// ── Step 3: Review & Submit ──
+function renderStep3(body, footer, cart) {
+  const contact = JSON.parse(localStorage.getItem('gp_contact') || '{}');
+
+  let productRows = cart.map(item => `
+    <div class="review-product-row">
+      <img src="${item.img}" alt="${item.name}">
+      <span class="review-product-name">${item.name}</span>
+      <span class="review-product-qty">×${item.qty}</span>
+    </div>`).join('');
+
+  body.innerHTML = `
+    <div class="quote-review">
+      <div class="review-section">
+        <h4><i class="fas fa-box"></i> Products (${cart.length})</h4>
+        ${productRows}
+      </div>
+      <div class="review-section">
+        <h4><i class="fas fa-user"></i> Contact Information</h4>
+        <div class="review-info-grid">
+          <div class="review-info-item"><span class="review-label">Name</span><span>${contact.name}</span></div>
+          <div class="review-info-item"><span class="review-label">Email</span><span>${contact.email}</span></div>
+          ${contact.phone ? `<div class="review-info-item"><span class="review-label">Phone</span><span>${contact.phone}</span></div>` : ''}
+          ${contact.date ? `<div class="review-info-item"><span class="review-label">Event Date</span><span>${contact.date}</span></div>` : ''}
+          ${contact.message ? `<div class="review-info-item review-message"><span class="review-label">Message</span><span>${contact.message}</span></div>` : ''}
+        </div>
+      </div>
+    </div>`;
+
+  footer.innerHTML = `
+    <button class="quote-btn quote-btn-outline" onclick="goToStep(2)"><i class="fas fa-arrow-left"></i> Back</button>
+    <button class="quote-btn quote-btn-submit" onclick="submitQuote()"><i class="fas fa-paper-plane"></i> Submit Quote Request</button>`;
+}
+
+// ── Submit ──
+function submitQuote() {
+  const cart = getCart();
+  const contact = JSON.parse(localStorage.getItem('gp_contact') || '{}');
+
+  // Build mailto body
+  let body = `Quote Request from ${contact.name}\n\n`;
+  body += `Products:\n`;
+  cart.forEach((item, i) => {
+    body += `  ${i+1}. ${item.name} — Qty: ${item.qty}\n`;
+  });
+  body += `\nContact:\n`;
+  body += `  Name: ${contact.name}\n`;
+  body += `  Email: ${contact.email}\n`;
+  if (contact.phone) body += `  Phone: ${contact.phone}\n`;
+  if (contact.date) body += `  Event Date: ${contact.date}\n`;
+  if (contact.message) body += `\nMessage:\n  ${contact.message}\n`;
+
+  const subject = encodeURIComponent(`Quote Request — ${cart.length} item${cart.length > 1 ? 's' : ''} — ${contact.name}`);
+  const mailBody = encodeURIComponent(body);
+
+  // Show success state
+  const modalBody = document.getElementById('quoteBody');
+  const modalFooter = document.getElementById('quoteFooter');
+
+  modalBody.innerHTML = `
+    <div class="quote-success">
+      <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+      <h3>Quote Request Submitted!</h3>
+      <p>Thank you, ${contact.name}! We'll review your request and get back to you within 24 hours.</p>
+      <div class="success-summary">
+        <span><strong>${cart.length}</strong> product${cart.length > 1 ? 's' : ''} requested</span>
+        <span>Confirmation sent to <strong>${contact.email}</strong></span>
+      </div>
+    </div>`;
+
+  modalFooter.innerHTML = `
+    <button class="quote-btn quote-btn-primary" onclick="closeQuoteModal(); clearCart(); localStorage.removeItem('gp_contact');" style="width:100%;">Done</button>`;
+
+  // Open email client
+  window.location.href = `mailto:info@giantpro.com?subject=${subject}&body=${mailBody}`;
+}
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded', () => {
+  updateBadge();
 });
