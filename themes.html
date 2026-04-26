@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Themes & Ambience | Giant Promotions & Events</title>
+  <meta name="description" content="Transform your event with stunning themed decor. From Casino Night to Hawaiian Luau, Christmas to Pride — Giant Promotions brings your vision to life.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    .themes-section { padding: 5rem 0; }
+    .theme-category { margin-bottom: 4rem; }
+    .theme-category h2 {
+      font-size: 1.8rem; color: var(--gold-light);
+      margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.8rem;
+    }
+    .theme-category h2 i { font-size: 1.4rem; color: var(--gold); }
+    .theme-category > p {
+      color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem;
+    }
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.2rem;
+    }
+    .theme-card {
+      background: var(--bg-card); border-radius: var(--radius);
+      padding: 1.6rem; text-align: center;
+      border: 1px solid rgba(255,255,255,0.04);
+      transition: all 0.4s var(--ease);
+      cursor: pointer; text-decoration: none; color: inherit;
+    }
+    .theme-card:hover {
+      border-color: rgba(240,192,64,0.25);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      background: var(--bg-elevated);
+    }
+    .theme-card .theme-emoji {
+      font-size: 2.2rem; margin-bottom: 0.8rem;
+      display: block;
+    }
+    .theme-card h4 {
+      font-size: 1rem; color: var(--white); margin-bottom: 0.3rem;
+    }
+    .theme-card p {
+      font-size: 0.8rem; color: var(--text-muted);
+    }
+    .theme-divider {
+      border: none; border-top: 1px solid rgba(255,255,255,0.04);
+      margin: 3rem 0;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <a href="index.html" class="nav-logo"><img src="images/logo.png" alt="Giant Promotions"></a>
+    <button class="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="catalog.html">Catalog</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<section class="page-hero">
+  <div class="page-hero-bg"><img src="images/hero-crowd.jpg" alt=""></div>
+  <div class="container">
+    <span class="section-label">Ambience & Decoration</span>
+    <h1>Event Themes</h1>
+    <p>Transform any venue with our themed decor packages. Choose your vibe below.</p>
+  </div>
+</section>
+
+<section class="themes-section">
+  <div class="container">
+
+    <!-- THEMES -->
+    <div class="theme-category">
+      <h2><i class="fas fa-palette"></i> Themes</h2>
+      <p>Set the mood with a complete themed experience for your event.</p>
+      <div class="theme-grid">
+        <a href="contact.html?product=Carnival Theme Package" class="theme-card">
+          <span class="theme-emoji">🎪</span><h4>Carnival</h4><p>Games, prizes & midway fun</p>
+        </a>
+        <a href="collections/casino.html" class="theme-card">
+          <span class="theme-emoji">🎰</span><h4>Casino</h4><p>Vegas-style tables & decor</p>
+        </a>
+        <a href="contact.html?product=Fall Theme Package" class="theme-card">
+          <span class="theme-emoji">🍂</span><h4>Fall</h4><p>Autumn harvest ambience</p>
+        </a>
+        <a href="contact.html?product=Hawaiian Luau Theme" class="theme-card">
+          <span class="theme-emoji">🌺</span><h4>Hawaiian Luau</h4><p>Tropical island vibes</p>
+        </a>
+        <a href="contact.html?product=Maritime Theme Package" class="theme-card">
+          <span class="theme-emoji">⚓</span><h4>Maritime</h4><p>East coast nautical charm</p>
+        </a>
+        <a href="contact.html?product=Mexican Fiesta Theme" class="theme-card">
+          <span class="theme-emoji">🌮</span><h4>Mexican Fiesta</h4><p>Vibrant colors & fiesta</p>
+        </a>
+        <a href="contact.html?product=Pride Theme Package" class="theme-card">
+          <span class="theme-emoji">🏳️‍🌈</span><h4>Pride</h4><p>Rainbow celebration decor</p>
+        </a>
+        <a href="contact.html?product=Summer Theme Package" class="theme-card">
+          <span class="theme-emoji">☀️</span><h4>Summer</h4><p>Beach & sunshine energy</p>
+        </a>
+      </div>
+    </div>
+
+    <hr class="theme-divider">
+
+    <!-- HOLIDAYS -->
+    <div class="theme-category">
+      <h2><i class="fas fa-calendar-days"></i> Holidays</h2>
+      <p>Seasonal and holiday-themed decorations and props.</p>
+      <div class="theme-grid">
+        <a href="contact.html?product=Canada Day Decorations" class="theme-card">
+          <span class="theme-emoji">🍁</span><h4>Canada Day</h4><p>Red & white patriotic</p>
+        </a>
+        <a href="collections/inflatables-holidays.html" class="theme-card">
+          <span class="theme-emoji">🎄</span><h4>Christmas</h4><p>Santa, trees & winter magic</p>
+        </a>
+        <a href="contact.html?product=Diwali Decorations" class="theme-card">
+          <span class="theme-emoji">🪔</span><h4>Diwali</h4><p>Festival of lights</p>
+        </a>
+        <a href="contact.html?product=Easter Decorations" class="theme-card">
+          <span class="theme-emoji">🐣</span><h4>Easter</h4><p>Spring bunnies & eggs</p>
+        </a>
+        <a href="contact.html?product=Halloween Decorations" class="theme-card">
+          <span class="theme-emoji">🎃</span><h4>Halloween</h4><p>Spooky thrills & chills</p>
+        </a>
+        <a href="contact.html?product=Hanukkah Decorations" class="theme-card">
+          <span class="theme-emoji">🕎</span><h4>Hanukkah</h4><p>Menorah & festival decor</p>
+        </a>
+        <a href="contact.html?product=Mardi Gras Decorations" class="theme-card">
+          <span class="theme-emoji">🎭</span><h4>Mardi Gras</h4><p>Masks, beads & celebration</p>
+        </a>
+        <a href="contact.html?product=New Years Eve Package" class="theme-card">
+          <span class="theme-emoji">🎆</span><h4>New Year's Eve</h4><p>Countdown & confetti</p>
+        </a>
+        <a href="contact.html?product=Oktoberfest Decorations" class="theme-card">
+          <span class="theme-emoji">🍺</span><h4>Oktoberfest</h4><p>German beer fest vibes</p>
+        </a>
+        <a href="contact.html?product=Ramadan Decorations" class="theme-card">
+          <span class="theme-emoji">🌙</span><h4>Ramadan</h4><p>Crescent & lantern decor</p>
+        </a>
+        <a href="contact.html?product=St. Patrick's Day Package" class="theme-card">
+          <span class="theme-emoji">☘️</span><h4>St. Patrick's</h4><p>Lucky green everything</p>
+        </a>
+        <a href="contact.html?product=Thanksgiving Decorations" class="theme-card">
+          <span class="theme-emoji">🦃</span><h4>Thanksgiving</h4><p>Harvest feast ambience</p>
+        </a>
+        <a href="contact.html?product=Valentine's Day Package" class="theme-card">
+          <span class="theme-emoji">💕</span><h4>Valentine's Day</h4><p>Romance & red roses</p>
+        </a>
+      </div>
+    </div>
+
+    <hr class="theme-divider">
+
+    <!-- SPECIAL OCCASIONS -->
+    <div class="theme-category">
+      <h2><i class="fas fa-champagne-glasses"></i> Special Occasions</h2>
+      <p>Make life's milestones unforgettable with the perfect decor.</p>
+      <div class="theme-grid">
+        <a href="contact.html?product=Anniversary Decorations" class="theme-card">
+          <span class="theme-emoji">💍</span><h4>Anniversary</h4><p>Elegant milestone celebration</p>
+        </a>
+        <a href="contact.html?product=Baby Shower Package" class="theme-card">
+          <span class="theme-emoji">👶</span><h4>Baby Shower</h4><p>Sweet welcome decorations</p>
+        </a>
+        <a href="contact.html?product=Graduation Package" class="theme-card">
+          <span class="theme-emoji">🎓</span><h4>Graduation</h4><p>Cap & gown celebrations</p>
+        </a>
+        <a href="contact.html?product=Wedding Decorations" class="theme-card">
+          <span class="theme-emoji">💒</span><h4>Wedding</h4><p>Enchanting wedding decor</p>
+        </a>
+      </div>
+    </div>
+
+    <hr class="theme-divider">
+
+    <!-- SPORTS -->
+    <div class="theme-category">
+      <h2><i class="fas fa-medal"></i> Sports</h2>
+      <p>Game day decor and sports-themed event setups.</p>
+      <div class="theme-grid">
+        <a href="contact.html?product=Automotive Sports Theme" class="theme-card">
+          <span class="theme-emoji">🏎️</span><h4>Automotive</h4><p>Racing & car show setups</p>
+        </a>
+        <a href="contact.html?product=Football Theme Package" class="theme-card">
+          <span class="theme-emoji">🏈</span><h4>Football (CFL/NFL)</h4><p>Tailgate & touchdown vibes</p>
+        </a>
+        <a href="contact.html?product=Golf Theme Package" class="theme-card">
+          <span class="theme-emoji">⛳</span><h4>Golf</h4><p>Tournament & tee-time</p>
+        </a>
+        <a href="contact.html?product=Soccer Theme Package" class="theme-card">
+          <span class="theme-emoji">⚽</span><h4>Soccer</h4><p>Pitch-side party decor</p>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="cta">
+  <div class="cta-bg"></div>
+  <div class="container">
+    <h2>Need a Custom Theme?</h2>
+    <p>We create bespoke themed environments for any event. Tell us your vision.</p>
+    <a href="contact.html" class="btn btn-gold">Get a Free Consultation</a>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <img src="images/logo.png" alt="Giant Promotions" style="height:55px;margin-bottom:1.2rem;">
+        <p>Atlantic Canada's premier promotions and event rental company. Making events giant since 1992.</p>
+        <div class="socials">
+          <a href="https://www.facebook.com/GiantPromotions/" target="_blank"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://www.instagram.com/giantpromotions/" target="_blank"><i class="fab fa-instagram"></i></a>
+          <a href="https://twitter.com/GiantProHfx" target="_blank"><i class="fab fa-x-twitter"></i></a>
+          <a href="https://www.youtube.com/@giantpromotionsltd9955" target="_blank"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+      <div class="footer-col"><h4>Navigation</h4><ul class="footer-links"><li><a href="index.html">Home</a></li><li><a href="about.html">About Us</a></li><li><a href="catalog.html">Full Catalog</a></li><li><a href="services.html">Services</a></li><li><a href="gallery.html">Gallery</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+      <div class="footer-col"><h4>Popular</h4><ul class="footer-links"><li><a href="collections/casino.html">Casino Night</a></li><li><a href="collections/games-bouncers-slides.html">Bouncers & Slides</a></li><li><a href="collections/inflatables-characters.html">Inflatables</a></li><li><a href="collections/event-rentals-entertainment.html">Entertainment</a></li><li><a href="collections/tents.html">Tents</a></li><li><a href="collections/dealer-supplies.html">Dealer Supplies</a></li></ul></div>
+      <div class="footer-col"><h4>Contact</h4><div class="contact-line"><i class="fas fa-location-dot"></i><span>3797 MacKintosh St<br>Halifax, NS B3K 5A6</span></div><div class="contact-line"><i class="fas fa-phone"></i><span>902-456-6487</span></div><div class="contact-line"><i class="fas fa-envelope"></i><span>info@giantpro.com</span></div></div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 Giant Promotions & Events Ltd. All rights reserved.</div>
+  </div>
+</footer>
+<script src="script.js"></script>
+<!-- Cart Toggle Button -->
+<button class="cart-toggle" id="cartToggle" onclick="toggleCart()">
+  <i class="fas fa-shopping-cart"></i>
+  <span class="cart-badge" id="cartBadge">0</span>
+</button>
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <h3><i class="fas fa-shopping-cart"></i> Your Quote Cart</h3>
+    <button class="cart-close" onclick="toggleCart()"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty" id="cartEmpty">
+      <i class="fas fa-cart-plus"></i>
+      <p>Your cart is empty</p>
+      <span>Add products to request a quote</span>
+    </div>
+  </div>
+  <div class="cart-footer" id="cartFooter" style="display:none;">
+    <button class="btn btn-ghost btn-sm" onclick="clearCart()" style="width:100%;margin-bottom:0.8rem;"><i class="fas fa-trash"></i> Clear Cart</button>
+    <a href="/contact.html?cart=true" class="btn btn-gold" id="checkoutBtn" style="width:100%;justify-content:center;" onclick="return prepareCheckout()"><i class="fas fa-paper-plane"></i> Request Quote</a>
+  </div>
+</div>
+<script src="cart.js"></script>
+</body>
+</html>
