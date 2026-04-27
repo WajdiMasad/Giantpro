@@ -248,47 +248,82 @@ function renderStep3(body, footer, cart) {
     <button class="quote-btn quote-btn-submit" onclick="submitQuote()"><i class="fas fa-paper-plane"></i> Submit Quote Request</button>`;
 }
 
-// ── Submit ──
-function submitQuote() {
+// ── Submit via Web3Forms ──
+async function submitQuote() {
   const cart = getCart();
   const contact = JSON.parse(localStorage.getItem('gp_contact') || '{}');
 
-  // Build mailto body
-  let body = `Quote Request from ${contact.name}\n\n`;
-  body += `Products:\n`;
-  cart.forEach((item, i) => {
-    body += `  ${i+1}. ${item.name} — Qty: ${item.qty}\n`;
-  });
-  body += `\nContact:\n`;
-  body += `  Name: ${contact.name}\n`;
-  body += `  Email: ${contact.email}\n`;
-  if (contact.phone) body += `  Phone: ${contact.phone}\n`;
-  if (contact.date) body += `  Event Date: ${contact.date}\n`;
-  if (contact.message) body += `\nMessage:\n  ${contact.message}\n`;
+  // Build readable product list
+  let productList = cart.map((item, i) => 
+    `${i+1}. ${item.name} — Qty: ${item.qty}`
+  ).join('\n');
 
-  const subject = encodeURIComponent(`Quote Request — ${cart.length} item${cart.length > 1 ? 's' : ''} — ${contact.name}`);
-  const mailBody = encodeURIComponent(body);
+  let message = `QUOTE REQUEST\n\n`;
+  message += `Products:\n${productList}\n\n`;
+  message += `Contact:\n`;
+  message += `Name: ${contact.name}\n`;
+  message += `Email: ${contact.email}\n`;
+  if (contact.phone) message += `Phone: ${contact.phone}\n`;
+  if (contact.date) message += `Event Date: ${contact.date}\n`;
+  if (contact.message) message += `\nMessage:\n${contact.message}\n`;
 
-  // Show success state
+  // Show loading state
   const modalBody = document.getElementById('quoteBody');
   const modalFooter = document.getElementById('quoteFooter');
-
   modalBody.innerHTML = `
     <div class="quote-success">
-      <div class="success-icon"><i class="fas fa-check-circle"></i></div>
-      <h3>Quote Request Submitted!</h3>
-      <p>Thank you, ${contact.name}! We'll review your request and get back to you within 24 hours.</p>
-      <div class="success-summary">
-        <span><strong>${cart.length}</strong> product${cart.length > 1 ? 's' : ''} requested</span>
-        <span>Confirmation sent to <strong>${contact.email}</strong></span>
-      </div>
+      <div class="success-icon"><i class="fas fa-spinner fa-spin"></i></div>
+      <h3>Sending your quote request...</h3>
+      <p>Please wait while we process your request.</p>
     </div>`;
+  modalFooter.innerHTML = '';
 
-  modalFooter.innerHTML = `
-    <button class="quote-btn quote-btn-primary" onclick="closeQuoteModal(); clearCart(); localStorage.removeItem('gp_contact');" style="width:100%;">Done</button>`;
+  try {
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        access_key: 'YOUR_WEB3FORMS_KEY',
+        subject: `Quote Request — ${cart.length} item${cart.length > 1 ? 's' : ''} — ${contact.name}`,
+        from_name: contact.name,
+        email: contact.email,
+        phone: contact.phone || 'Not provided',
+        event_date: contact.date || 'Not specified',
+        products: productList,
+        message: contact.message || 'No additional message',
+        full_message: message
+      })
+    });
 
-  // Open email client
-  window.location.href = `mailto:info@giantpro.com?subject=${subject}&body=${mailBody}`;
+    const data = await res.json();
+
+    if (data.success) {
+      modalBody.innerHTML = `
+        <div class="quote-success">
+          <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+          <h3>Quote Request Sent!</h3>
+          <p>Thank you, ${contact.name}! Our team will review your request and get back to you within 24 hours.</p>
+          <div class="success-summary">
+            <span><strong>${cart.length}</strong> product${cart.length > 1 ? 's' : ''} requested</span>
+            <span>We'll respond to <strong>${contact.email}</strong></span>
+          </div>
+        </div>`;
+      modalFooter.innerHTML = `
+        <button class="quote-btn quote-btn-primary" onclick="closeQuoteModal(); clearCart(); localStorage.removeItem('gp_contact');" style="width:100%;">Done</button>`;
+    } else {
+      throw new Error('Submission failed');
+    }
+  } catch(err) {
+    modalBody.innerHTML = `
+      <div class="quote-success">
+        <div class="success-icon" style="color:#ef4444;"><i class="fas fa-exclamation-triangle"></i></div>
+        <h3>Something went wrong</h3>
+        <p>Please try again, or contact us directly at <strong>info@giantpro.com</strong> or <strong>902-456-6487</strong>.</p>
+      </div>`;
+    modalFooter.innerHTML = `
+      <button class="quote-btn quote-btn-outline" onclick="goToStep(3)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="quote-btn quote-btn-submit" onclick="submitQuote()"><i class="fas fa-redo"></i> Try Again</button>`;
+  }
 }
 
 // ── Init ──
