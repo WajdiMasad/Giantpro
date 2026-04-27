@@ -1,41 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const { parse } = require('csv-parse/sync');
 
-// ── Parse CSVs ──
-const mainCsv = parse(fs.readFileSync('products_export_1.csv', 'utf8'), { columns: true, skip_empty_lines: true, relax_column_count: true });
-const dealerCsv = parse(fs.readFileSync('dealer supplies.csv', 'utf8'), { columns: true, skip_empty_lines: true, relax_column_count: true });
-
-// ── Build product database ──
-function extractProducts(rows, defaultCollection) {
-  const products = {};
-  for (const row of rows) {
-    const handle = row.Handle;
-    if (!handle) continue;
-    if (!products[handle]) {
-      products[handle] = {
-        handle,
-        title: row.Title || '',
-        body: row['Body (HTML)'] || '',
-        vendor: row.Vendor || '',
-        type: row.Type || '',
-        tags: row.Tags || '',
-        images: [],
-        price: row['Variant Price'] || '0.00',
-        defaultCollection
-      };
-    }
-    const imgSrc = row['Image Src'];
-    if (imgSrc && !products[handle].images.includes(imgSrc)) {
-      products[handle].images.push(imgSrc);
-    }
-    if (!products[handle].title && row.Title) products[handle].title = row.Title;
-  }
-  return Object.values(products).filter(p => p.title);
-}
-
-const mainProducts = extractProducts(mainCsv, null);
-const dealerProducts = extractProducts(dealerCsv, 'dealer-supplies');
+// ── Load product database (JSON) ──
+const allProducts = JSON.parse(fs.readFileSync('products.json', 'utf8'));
 
 // ── Collection mapping based on tags/title keywords ──
 const COLLECTIONS = {
@@ -76,7 +43,6 @@ const COLLECTIONS = {
 const collectionProducts = {};
 for (const key of Object.keys(COLLECTIONS)) collectionProducts[key] = [];
 
-const allProducts = [...mainProducts, ...dealerProducts];
 const assigned = new Set();
 
 for (const p of allProducts) {
