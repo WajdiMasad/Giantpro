@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://giantpro.com/sitemap.xml
+
+# Giant Promotions & Events Ltd.
+# Halifax, Nova Scotia — Atlantic Canada's Premier Event Company

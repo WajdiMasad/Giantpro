@@ -145,21 +145,42 @@ function productCard(p) {
 }
 
 function collectionPage(key, col, products) {
+  const thumbImg = products[0] && products[0].images[0] ? products[0].images[0] : '/images/placeholder.jpg';
+  const productNames = products.slice(0, 5).map(p => p.title).join(', ');
+  const schemaItems = products.slice(0, 20).map((p, i) => `{"@type":"ListItem","position":${i+1},"name":"${p.title.replace(/"/g, '\\"')}","url":"https://giantpro.com/collections/${key}.html"}`).join(',');
+  
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${col.name} | Giant Promotions & Events</title>
-  <meta name="description" content="Browse our ${col.name} collection. ${products.length} products available for rent or purchase from Giant Promotions & Events, Halifax NS.">
+  <title>${col.name} Rentals | ${products.length} Products | Giant Promotions Halifax NS</title>
+  <meta name="description" content="Rent ${col.name.toLowerCase()} for your next event in Halifax & Atlantic Canada. ${products.length} products available including ${productNames}. Free quotes from Giant Promotions — 902-456-6487.">
+  <meta name="keywords" content="${col.name.toLowerCase()} rental Halifax, ${col.name.toLowerCase()} rental Nova Scotia, ${col.name.toLowerCase()} Atlantic Canada, event rentals Halifax, Giant Promotions ${col.name.toLowerCase()}">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://giantpro.com/collections/${key}.html">
+  <meta name="geo.region" content="CA-NS">
+  <meta name="geo.placename" content="Halifax, Nova Scotia">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Giant Promotions & Events">
+  <meta property="og:title" content="${col.name} Rentals | Giant Promotions Halifax">
+  <meta property="og:description" content="${products.length} ${col.name.toLowerCase()} products available for rent. Serving Halifax & Atlantic Canada since 1992.">
+  <meta property="og:url" content="https://giantpro.com/collections/${key}.html">
+  <meta property="og:image" content="${thumbImg.startsWith('http') ? thumbImg : 'https://giantpro.com' + thumbImg}">
   <link rel="stylesheet" href="/style.css?v=2">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"ItemList","name":"${col.name} — Giant Promotions","description":"${col.name} available for rent from Giant Promotions & Events, Halifax NS.","numberOfItems":${products.length},"itemListElement":[${schemaItems}]}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://giantpro.com/"},{"@type":"ListItem","position":2,"name":"Catalog","item":"https://giantpro.com/catalog.html"},{"@type":"ListItem","position":3,"name":"${col.name}","item":"https://giantpro.com/collections/${key}.html"}]}
+  </script>
 </head>
 <body>
 ${NAV_HTML}
 
 <section class="page-hero">
-  <div class="page-hero-bg"><img src="/images/hero-crowd.jpg" alt=""></div>
+  <div class="page-hero-bg"><img src="/images/hero-crowd.jpg" alt="${col.name} rentals from Giant Promotions Halifax NS"></div>
   <div class="container">
     <span class="section-label">${col.parent}</span>
     <h1>${col.name}</h1>
@@ -243,8 +264,19 @@ const catalogHtml = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Product Catalog | Giant Promotions & Events</title>
-  <meta name="description" content="Browse our complete product catalog. Over 300 products available for rent or purchase across Atlantic Canada.">
+  <title>Event Rental Catalog | ${totalProducts}+ Products | Giant Promotions Halifax NS</title>
+  <meta name="description" content="Browse ${pagesGenerated} categories and ${totalProducts}+ event rental products. Inflatables, casino equipment, tents, LED signs, carnival games & more. Free quotes — Giant Promotions, Halifax NS. 902-456-6487.">
+  <meta name="keywords" content="event rental catalog Halifax, party rental catalog Nova Scotia, inflatable rental catalog, event equipment Atlantic Canada, Giant Promotions products">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://giantpro.com/catalog.html">
+  <meta name="geo.region" content="CA-NS">
+  <meta name="geo.placename" content="Halifax, Nova Scotia">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Giant Promotions & Events">
+  <meta property="og:title" content="Event Rental Catalog | ${totalProducts}+ Products | Giant Promotions">
+  <meta property="og:description" content="${pagesGenerated} categories, ${totalProducts}+ products for rent across Atlantic Canada.">
+  <meta property="og:url" content="https://giantpro.com/catalog.html">
+  <meta property="og:image" content="https://giantpro.com/images/og-image.jpg">
   <link rel="stylesheet" href="/style.css?v=2">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
