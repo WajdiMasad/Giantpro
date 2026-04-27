@@ -186,7 +186,7 @@ function collectionPage(key, col, products) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${col.name} | Giant Promotions & Events</title>
   <meta name="description" content="Browse our ${col.name} collection. ${products.length} products available for rent or purchase from Giant Promotions & Events, Halifax NS.">
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/style.css?v=2">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
@@ -221,7 +221,7 @@ ${products.map(p => productCard(p)).join('\n')}
 ${FOOTER_HTML}
 ${CART_HTML}
 <script src="/script.js"></script>
-<script src="/cart.js"></script>
+<script src="/cart.js?v=2"></script>
 </body>
 </html>`;
 }
@@ -279,7 +279,7 @@ const catalogHtml = `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Product Catalog | Giant Promotions & Events</title>
   <meta name="description" content="Browse our complete product catalog. Over 300 products available for rent or purchase across Atlantic Canada.">
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/style.css?v=2">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>

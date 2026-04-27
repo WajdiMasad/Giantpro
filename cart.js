@@ -91,7 +91,6 @@ function goToStep(step) {
     if (cart.length === 0) return;
   }
   if (step === 3) {
-    // Validate contact fields
     const name = document.getElementById('qName').value.trim();
     const email = document.getElementById('qEmail').value.trim();
     if (!name || !email) {
@@ -104,7 +103,6 @@ function goToStep(step) {
 }
 
 function renderStep(step) {
-  // Update step indicators
   document.querySelectorAll('.quote-step-tab').forEach(tab => {
     const s = parseInt(tab.dataset.step);
     tab.classList.toggle('active', s === step);
@@ -115,91 +113,63 @@ function renderStep(step) {
   const footer = document.getElementById('quoteFooter');
   const cart = getCart();
 
-  if (step === 1) {
-    renderStep1(body, footer, cart);
-  } else if (step === 2) {
-    renderStep2(body, footer);
-  } else if (step === 3) {
-    renderStep3(body, footer, cart);
-  }
+  if (step === 1) renderStep1(body, footer, cart);
+  else if (step === 2) renderStep2(body, footer);
+  else if (step === 3) renderStep3(body, footer, cart);
 }
 
 // ── Step 1: Products Selection ──
 function renderStep1(body, footer, cart) {
   if (cart.length === 0) {
-    body.innerHTML = `
-      <div class="quote-empty">
-        <i class="fas fa-cart-plus"></i>
-        <h4>Your quote list is empty</h4>
-        <p>Browse our catalog and add products to get started</p>
-      </div>`;
-    footer.innerHTML = `
-      <button class="quote-btn quote-btn-outline" onclick="closeQuoteModal()">Continue Shopping</button>`;
+    body.innerHTML = '<div class="quote-empty"><i class="fas fa-cart-plus"></i><h4>Your quote list is empty</h4><p>Browse our catalog and add products to get started</p></div>';
+    footer.innerHTML = '<button class="quote-btn quote-btn-outline" onclick="closeQuoteModal()">Continue Shopping</button>';
     return;
   }
 
-  let rows = cart.map(item => `
-    <div class="quote-product-row">
-      <img src="${item.img}" alt="${item.name}">
-      <div class="quote-product-name">${item.name}</div>
-      <input type="number" class="quote-qty-input" value="${item.qty}" min="1" 
-             onchange="updateCartQty('${item.name.replace(/'/g, "\\'")}', this.value); renderStep(1);">
-      <button class="quote-remove-btn" onclick="removeFromCart('${item.name.replace(/'/g, "\\'")}')">
-        <i class="fas fa-trash-alt"></i>
-      </button>
-    </div>`).join('');
+  var rows = '';
+  for (var i = 0; i < cart.length; i++) {
+    var item = cart[i];
+    var safeName = item.name.replace(/'/g, "\\'");
+    rows += '<div class="quote-product-row">';
+    rows += '  <div class="quote-product-info">';
+    rows += '    <img src="' + item.img + '" alt="' + item.name + '">';
+    rows += '    <span>' + item.name + '</span>';
+    rows += '  </div>';
+    rows += '  <input type="number" class="quote-qty-input" value="' + item.qty + '" min="1" onchange="updateCartQty(\'' + safeName + '\', this.value); renderStep(1);">';
+    rows += '  <button class="quote-remove-btn" onclick="removeFromCart(\'' + safeName + '\')" title="Remove"><i class="fas fa-trash-alt"></i></button>';
+    rows += '</div>';
+  }
 
-  body.innerHTML = `
-    <div class="quote-products-table">
-      <div class="quote-table-header">
-        <span>Product</span>
-        <span>Quantity</span>
-        <span></span>
-      </div>
-      ${rows}
-    </div>`;
+  body.innerHTML = '<div class="quote-products-table">' +
+    '<div class="quote-table-header"><span>Product</span><span>Quantity</span><span></span></div>' +
+    rows + '</div>';
 
-  footer.innerHTML = `
-    <button class="quote-btn quote-btn-outline" onclick="closeQuoteModal()">Continue Shopping</button>
-    <button class="quote-btn quote-btn-primary" onclick="goToStep(2)">Next Step <i class="fas fa-arrow-right"></i></button>`;
+  footer.innerHTML = '<button class="quote-btn quote-btn-outline" onclick="closeQuoteModal()">Continue Shopping</button>' +
+    '<button class="quote-btn quote-btn-primary" onclick="goToStep(2)">Next Step <i class="fas fa-arrow-right"></i></button>';
 }
 
 // ── Step 2: Contact Information ──
 function renderStep2(body, footer) {
-  // Preserve existing values
-  const saved = JSON.parse(localStorage.getItem('gp_contact') || '{}');
+  var saved = JSON.parse(localStorage.getItem('gp_contact') || '{}');
 
-  body.innerHTML = `
-    <div class="quote-contact-form">
-      <div class="quote-form-group">
-        <label for="qName">Full Name <span class="req">*</span></label>
-        <input type="text" id="qName" class="quote-input" placeholder="John Doe" value="${saved.name || ''}" required>
-      </div>
-      <div class="quote-form-group">
-        <label for="qEmail">Email Address <span class="req">*</span></label>
-        <input type="email" id="qEmail" class="quote-input" placeholder="john@example.com" value="${saved.email || ''}" required>
-      </div>
-      <div class="quote-form-group">
-        <label for="qPhone">Phone Number</label>
-        <input type="tel" id="qPhone" class="quote-input" placeholder="902-555-0000" value="${saved.phone || ''}">
-      </div>
-      <div class="quote-form-group">
-        <label for="qDate">Event Date</label>
-        <input type="date" id="qDate" class="quote-input" value="${saved.date || ''}">
-      </div>
-      <div class="quote-form-group">
-        <label for="qMessage">Message / Special Instructions</label>
-        <textarea id="qMessage" class="quote-input quote-textarea" placeholder="Tell us about your event, venue, or any special requirements...">${saved.message || ''}</textarea>
-      </div>
-    </div>`;
+  body.innerHTML = '<div class="quote-contact-form">' +
+    '<div class="quote-form-row">' +
+      '<div class="quote-form-group"><label for="qName">Full Name <span class="req">*</span></label><input type="text" id="qName" class="quote-input" placeholder="John Doe" value="' + (saved.name || '') + '" required></div>' +
+      '<div class="quote-form-group"><label for="qEmail">Email Address <span class="req">*</span></label><input type="email" id="qEmail" class="quote-input" placeholder="john@example.com" value="' + (saved.email || '') + '" required></div>' +
+    '</div>' +
+    '<div class="quote-form-row">' +
+      '<div class="quote-form-group"><label for="qPhone">Phone Number</label><input type="tel" id="qPhone" class="quote-input" placeholder="902-555-0000" value="' + (saved.phone || '') + '"></div>' +
+      '<div class="quote-form-group"><label for="qDate">Event Date</label><input type="date" id="qDate" class="quote-input" value="' + (saved.date || '') + '"></div>' +
+    '</div>' +
+    '<div class="quote-form-group"><label for="qMessage">Message / Special Instructions</label><textarea id="qMessage" class="quote-input quote-textarea" placeholder="Tell us about your event, venue, or any special requirements...">' + (saved.message || '') + '</textarea></div>' +
+  '</div>';
 
-  footer.innerHTML = `
-    <button class="quote-btn quote-btn-outline" onclick="goToStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
-    <button class="quote-btn quote-btn-primary" onclick="saveContactAndNext()">Next Step <i class="fas fa-arrow-right"></i></button>`;
+  footer.innerHTML = '<button class="quote-btn quote-btn-outline" onclick="goToStep(1)"><i class="fas fa-arrow-left"></i> Back</button>' +
+    '<button class="quote-btn quote-btn-primary" onclick="saveContactAndNext()">Next Step <i class="fas fa-arrow-right"></i></button>';
 }
 
 function saveContactAndNext() {
-  const contact = {
+  var contact = {
     name: document.getElementById('qName').value.trim(),
     email: document.getElementById('qEmail').value.trim(),
     phone: document.getElementById('qPhone').value.trim(),
@@ -216,75 +186,57 @@ function saveContactAndNext() {
 
 // ── Step 3: Review & Submit ──
 function renderStep3(body, footer, cart) {
-  const contact = JSON.parse(localStorage.getItem('gp_contact') || '{}');
+  var contact = JSON.parse(localStorage.getItem('gp_contact') || '{}');
 
-  let productRows = cart.map(item => `
-    <div class="review-product-row">
-      <img src="${item.img}" alt="${item.name}">
-      <span class="review-product-name">${item.name}</span>
-      <span class="review-product-qty">×${item.qty}</span>
-    </div>`).join('');
+  var productRows = '';
+  for (var i = 0; i < cart.length; i++) {
+    productRows += '<div class="review-product-row"><img src="' + cart[i].img + '" alt="' + cart[i].name + '"><span class="review-product-name">' + cart[i].name + '</span><span class="review-product-qty">&times;' + cart[i].qty + '</span></div>';
+  }
 
-  body.innerHTML = `
-    <div class="quote-review">
-      <div class="review-section">
-        <h4><i class="fas fa-box"></i> Products (${cart.length})</h4>
-        ${productRows}
-      </div>
-      <div class="review-section">
-        <h4><i class="fas fa-user"></i> Contact Information</h4>
-        <div class="review-info-grid">
-          <div class="review-info-item"><span class="review-label">Name</span><span>${contact.name}</span></div>
-          <div class="review-info-item"><span class="review-label">Email</span><span>${contact.email}</span></div>
-          ${contact.phone ? `<div class="review-info-item"><span class="review-label">Phone</span><span>${contact.phone}</span></div>` : ''}
-          ${contact.date ? `<div class="review-info-item"><span class="review-label">Event Date</span><span>${contact.date}</span></div>` : ''}
-          ${contact.message ? `<div class="review-info-item review-message"><span class="review-label">Message</span><span>${contact.message}</span></div>` : ''}
-        </div>
-      </div>
-    </div>`;
+  var contactHtml = '<div class="review-info-grid">' +
+    '<div class="review-info-item"><span class="review-label">Name</span><span>' + contact.name + '</span></div>' +
+    '<div class="review-info-item"><span class="review-label">Email</span><span>' + contact.email + '</span></div>';
+  if (contact.phone) contactHtml += '<div class="review-info-item"><span class="review-label">Phone</span><span>' + contact.phone + '</span></div>';
+  if (contact.date) contactHtml += '<div class="review-info-item"><span class="review-label">Event Date</span><span>' + contact.date + '</span></div>';
+  if (contact.message) contactHtml += '<div class="review-info-item review-message"><span class="review-label">Message</span><span>' + contact.message + '</span></div>';
+  contactHtml += '</div>';
 
-  footer.innerHTML = `
-    <button class="quote-btn quote-btn-outline" onclick="goToStep(2)"><i class="fas fa-arrow-left"></i> Back</button>
-    <button class="quote-btn quote-btn-submit" onclick="submitQuote()"><i class="fas fa-paper-plane"></i> Submit Quote Request</button>`;
+  body.innerHTML = '<div class="quote-review">' +
+    '<div class="review-section"><h4><i class="fas fa-box"></i> Products (' + cart.length + ')</h4>' + productRows + '</div>' +
+    '<div class="review-section"><h4><i class="fas fa-user"></i> Contact Information</h4>' + contactHtml + '</div>' +
+  '</div>';
+
+  footer.innerHTML = '<button class="quote-btn quote-btn-outline" onclick="goToStep(2)"><i class="fas fa-arrow-left"></i> Back</button>' +
+    '<button class="quote-btn quote-btn-submit" onclick="submitQuote()"><i class="fas fa-paper-plane"></i> Submit Quote Request</button>';
 }
 
 // ── Submit via Web3Forms ──
 async function submitQuote() {
-  const cart = getCart();
-  const contact = JSON.parse(localStorage.getItem('gp_contact') || '{}');
+  var cart = getCart();
+  var contact = JSON.parse(localStorage.getItem('gp_contact') || '{}');
 
-  // Build readable product list
-  let productList = cart.map((item, i) => 
-    `${i+1}. ${item.name} — Qty: ${item.qty}`
-  ).join('\n');
+  var productList = cart.map(function(item, i) {
+    return (i+1) + '. ' + item.name + ' — Qty: ' + item.qty;
+  }).join('\n');
 
-  let message = `QUOTE REQUEST\n\n`;
-  message += `Products:\n${productList}\n\n`;
-  message += `Contact:\n`;
-  message += `Name: ${contact.name}\n`;
-  message += `Email: ${contact.email}\n`;
-  if (contact.phone) message += `Phone: ${contact.phone}\n`;
-  if (contact.date) message += `Event Date: ${contact.date}\n`;
-  if (contact.message) message += `\nMessage:\n${contact.message}\n`;
+  var message = 'QUOTE REQUEST\n\nProducts:\n' + productList + '\n\nContact:\n' +
+    'Name: ' + contact.name + '\nEmail: ' + contact.email + '\n';
+  if (contact.phone) message += 'Phone: ' + contact.phone + '\n';
+  if (contact.date) message += 'Event Date: ' + contact.date + '\n';
+  if (contact.message) message += '\nMessage:\n' + contact.message + '\n';
 
-  // Show loading state
-  const modalBody = document.getElementById('quoteBody');
-  const modalFooter = document.getElementById('quoteFooter');
-  modalBody.innerHTML = `
-    <div class="quote-success">
-      <div class="success-icon"><i class="fas fa-spinner fa-spin"></i></div>
-      <h3>Sending your quote request...</h3>
-      <p>Please wait while we process your request.</p>
-    </div>`;
+  var modalBody = document.getElementById('quoteBody');
+  var modalFooter = document.getElementById('quoteFooter');
+  modalBody.innerHTML = '<div class="quote-success"><div class="success-icon"><i class="fas fa-spinner fa-spin"></i></div><h3>Sending your quote request...</h3><p>Please wait while we process your request.</p></div>';
   modalFooter.innerHTML = '';
 
   try {
-    const res = await fetch('https://api.web3forms.com/submit', {
+    var res = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         access_key: 'YOUR_WEB3FORMS_KEY',
-        subject: `Quote Request — ${cart.length} item${cart.length > 1 ? 's' : ''} — ${contact.name}`,
+        subject: 'Quote Request — ' + cart.length + ' item' + (cart.length > 1 ? 's' : '') + ' — ' + contact.name,
         from_name: contact.name,
         email: contact.email,
         phone: contact.phone || 'Not provided',
@@ -295,38 +247,21 @@ async function submitQuote() {
       })
     });
 
-    const data = await res.json();
+    var data = await res.json();
 
     if (data.success) {
-      modalBody.innerHTML = `
-        <div class="quote-success">
-          <div class="success-icon"><i class="fas fa-check-circle"></i></div>
-          <h3>Quote Request Sent!</h3>
-          <p>Thank you, ${contact.name}! Our team will review your request and get back to you within 24 hours.</p>
-          <div class="success-summary">
-            <span><strong>${cart.length}</strong> product${cart.length > 1 ? 's' : ''} requested</span>
-            <span>We'll respond to <strong>${contact.email}</strong></span>
-          </div>
-        </div>`;
-      modalFooter.innerHTML = `
-        <button class="quote-btn quote-btn-primary" onclick="closeQuoteModal(); clearCart(); localStorage.removeItem('gp_contact');" style="width:100%;">Done</button>`;
+      modalBody.innerHTML = '<div class="quote-success"><div class="success-icon"><i class="fas fa-check-circle"></i></div><h3>Quote Request Sent!</h3><p>Thank you, ' + contact.name + '! Our team will review your request and get back to you within 24 hours.</p><div class="success-summary"><span><strong>' + cart.length + '</strong> product' + (cart.length > 1 ? 's' : '') + ' requested</span><span>We\'ll respond to <strong>' + contact.email + '</strong></span></div></div>';
+      modalFooter.innerHTML = '<button class="quote-btn quote-btn-primary" onclick="closeQuoteModal(); clearCart(); localStorage.removeItem(\'gp_contact\');" style="width:100%;">Done</button>';
     } else {
       throw new Error('Submission failed');
     }
   } catch(err) {
-    modalBody.innerHTML = `
-      <div class="quote-success">
-        <div class="success-icon" style="color:#ef4444;"><i class="fas fa-exclamation-triangle"></i></div>
-        <h3>Something went wrong</h3>
-        <p>Please try again, or contact us directly at <strong>info@giantpro.com</strong> or <strong>902-456-6487</strong>.</p>
-      </div>`;
-    modalFooter.innerHTML = `
-      <button class="quote-btn quote-btn-outline" onclick="goToStep(3)"><i class="fas fa-arrow-left"></i> Back</button>
-      <button class="quote-btn quote-btn-submit" onclick="submitQuote()"><i class="fas fa-redo"></i> Try Again</button>`;
+    modalBody.innerHTML = '<div class="quote-success"><div class="success-icon" style="color:#ef4444;"><i class="fas fa-exclamation-triangle"></i></div><h3>Something went wrong</h3><p>Please try again, or contact us directly at <strong>info@giantpro.com</strong> or <strong>902-456-6487</strong>.</p></div>';
+    modalFooter.innerHTML = '<button class="quote-btn quote-btn-outline" onclick="goToStep(3)"><i class="fas fa-arrow-left"></i> Back</button><button class="quote-btn quote-btn-submit" onclick="submitQuote()"><i class="fas fa-redo"></i> Try Again</button>';
   }
 }
 
 // ── Init ──
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
   updateBadge();
 });
